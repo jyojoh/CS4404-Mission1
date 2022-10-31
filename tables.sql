@@ -14,9 +14,8 @@ CREATE TABLE options(
 
 CREATE INDEX idx_qid on options(qid);
 
-INSERT INTO questions (txt) VALUES(
-    "Which candidate are you voting for?"
-);
+INSERT INTO questions (txt) VALUES
+    ("Which candidate are you voting for?");
 
 INSERT INTO options (qid, txt, votes) VALUES
     (1, "Sole-vester Shoesworth", 0),

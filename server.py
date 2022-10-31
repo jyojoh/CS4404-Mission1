@@ -7,7 +7,8 @@ app.secret_key = "shoeserverkey"
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
-@app.route("/", methods = ["GET", "POST"])
+
+@app.route("/", methods=["GET", "POST"])
 def index():
     qid = 1
     if "vote" not in session:
@@ -24,6 +25,6 @@ def index():
 
     return render_template("webpage.html", **data)
 
+
 if __name__ == '__main__':
     app.run("localhost", 80)
-

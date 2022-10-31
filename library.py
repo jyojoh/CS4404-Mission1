@@ -1,10 +1,11 @@
 import sqlite3 as sql
 
+
 def get(qid):
-    dict = {
-        "q" :"",
-        "o":{},
-        "v":{}
+    question_dict = {
+        "q": "",
+        "o": {},
+        "v": {}
     }
 
     conn = sql.connect("database.db")
@@ -14,17 +15,18 @@ def get(qid):
     if data is None:
         return None
 
-    dict["q"] = data[0]
+    question_dict["q"] = data[0]
     cursor.execute("SELECT oid, txt, votes FROM options WHERE qid=?", (qid,))
     data = cursor.fetchall()
     if len(data) == 0:
         return None
     for index in data:
-        dict["o"][index[0]] = index[1]
-        dict["v"][index[0]] = index[2]
+        question_dict["o"][index[0]] = index[1]
+        question_dict["v"][index[0]] = index[2]
 
     conn.close()
-    return dict
+    return question_dict
+
 
 def save(qid, oid, oldid):
     conn = sql.connect("database.db")
@@ -36,8 +38,8 @@ def save(qid, oid, oldid):
         data[index[0]] = index[1]
 
     if oldid is not None:
-        if data[oldid] -1 > 0:
-            count = data[oldid] -1
+        if data[oldid] - 1 > 0:
+            count = data[oldid] - 1
         else:
             count = 0
 
