@@ -9,7 +9,8 @@ CREATE TABLE options(
     qid INTEGER NOT NULL, -- question assignment
     txt TEXT NOT NULL, -- candidate name
     votes INTEGER DEFAULT 0, -- number of votes for candidate
-    PRIMARY KEY("oid" AUTOINCREMENT)
+    PRIMARY KEY("oid" AUTOINCREMENT),
+    FOREIGN KEY ("qid") REFERENCES questions("qid")
 );
 
 CREATE INDEX idx_qid on options(qid);
