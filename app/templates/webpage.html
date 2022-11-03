@@ -1,0 +1,16 @@
+<form method="post" class="poll-docket">
+  <div class="poll-question">{{ q }}</div>
+
+  {% for oid, txt in o.items() %}
+  <label class="poll-option">
+    <input type="radio" name="vote" value="{{ oid }}" required
+    {% if session["vote"][qid] is defined and oid==session["vote"][qid] %}
+     checked
+    {% endif %}>
+    <span class="poll-text">{{txt}}</span>
+    <span class="poll-votes">({{v[oid]}})</span>
+  </label>
+  {% endfor %}
+
+  <input type="submit" class="poll-go" value="Go!">
+</form>
