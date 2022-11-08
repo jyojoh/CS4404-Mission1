@@ -24,7 +24,7 @@ CREATE INDEX idx_qid on options(qid);
 INSERT INTO questions (txt) VALUES
     ("Which candidate are you voting for?");
 
-INSERT INTO accounts (username, password) VALUES
+INSERT INTO accounts (id, username, password) VALUES
     (1, "1111", "password1"),
     (2, "2222", "password2"),
     (3, "3333", "password3");
