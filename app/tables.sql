@@ -13,10 +13,22 @@ CREATE TABLE options(
     FOREIGN KEY ("qid") REFERENCES questions("qid")
 );
 
+CREATE TABLE accounts(
+    id INTEGER,
+    username varchar(10) NOT NULL,
+    password varchar(10) NOT NULL
+);
+
 CREATE INDEX idx_qid on options(qid);
 
 INSERT INTO questions (txt) VALUES
     ("Which candidate are you voting for?");
+
+INSERT INTO accounts (username, password) VALUES
+    (1, "1111", "password1"),
+    (2, "2222", "password2"),
+    (3, "3333", "password3");
+
 
 INSERT INTO options (qid, txt, votes) VALUES
     (1, "Sole-vester Shoesworth", 0),

@@ -1,4 +1,4 @@
-from flask import Flask, session, render_template, request
+from flask import Flask, session, render_template, request, redirect
 from flask_session import Session
 import database as init
 import library as db
@@ -17,8 +17,15 @@ def index():
         session["vote"] = {}
 
     if request.method == "POST":
+        username = str(request.values.get("user"))
+        password = str(request.values.get("pass"))
+
+        if not db.checkUser(username, password):
+            return render_template("loginfail.html")
+
         oid = int(request.values.get("vote"))
         oldid = None if qid not in session["vote"] else session["vote"][qid]
+
         db.save(qid, oid, oldid)
         session["vote"][qid] = oid
 

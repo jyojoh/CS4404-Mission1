@@ -1,4 +1,8 @@
 <form method="post" class="poll-docket">
+
+  <input type = "text" name = "user" required>
+  <input type = "password" name = "pass" required>
+
   <div class="poll-question">{{ q }}</div>
 
   {% for oid, txt in o.items() %}
