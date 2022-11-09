@@ -48,12 +48,13 @@ def save(qid, oid, oldid):
         data[index[0]] = index[1]
 
     if oldid is not None:
-        if data[oldid] - 1 > 0:
+        if data[oldid] > 1:
             count = data[oldid] - 1
         else:
             count = 0
 
-        cursor.execute("UPDATE options SET votes=? WHERE qid=? AND oid=?", (count, qid, oid,))
+        cursor.execute("UPDATE options SET votes=? WHERE qid=? AND oid=?", (count, qid, oldid,))
+        data[oldid] -= 1
 
     count = data[oid] + 1
     cursor.execute("UPDATE options SET votes=? WHERE qid=? AND oid=?", (count, qid, oid,))
