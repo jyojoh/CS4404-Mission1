@@ -29,7 +29,6 @@ INSERT INTO accounts (id, username, password) VALUES
     (2, "2222", "password2"),
     (3, "3333", "password3");
 
-
 INSERT INTO options (qid, txt, votes) VALUES
     (1, "Sole-vester Shoesworth", 0),
     (1, "Croc-odile Sneakingson", 0),

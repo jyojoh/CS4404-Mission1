@@ -3,7 +3,7 @@ import sqlite3 as sql
 def checkUser(username, password):
     conn = sql.connect("database.db")
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM accounts WHERE username = '%s' AND password = '%s'" % (username, password))
+    cursor.execute("SELECT * FROM accounts WHERE username = ? AND password = ?", (username, password,))
     data = cursor.fetchall()
 
     if len(data) == 0:
