@@ -1,29 +1,134 @@
 <style>
-    .flex {display:flex; border: 10px black; height: 30px; width: 300px; padding: 10px; align-items: center;}
+    .flex {
+        display: flex;
+        border: 10px black;
+        height: 30px;
+        width: 300px;
+        padding: 10px;
+        align-items: center;
+    }
 </style>
 
-<form method="post" class="poll-docket">
+<script>
+    //Credits to https://developer.mozilla.org
+
+    // From https://developers.google.com/web/updates/2012/06/How-to-convert-ArrayBuffer-to-and-from-String
+    function str2ab(str) {
+        const buf = new ArrayBuffer(str.length);
+        const bufView = new Uint8Array(buf);
+        for (let i = 0, strLen = str.length; i < strLen; i++) {
+            bufView[i] = str.charCodeAt(i);
+        }
+        return buf;
+    }
+
+    const pemEncodedKey = `-----BEGIN PUBLIC KEY-----
+MIIBITANBgkqhkiG9w0BAQEFAAOCAQ4AMIIBCQKCAQBeg9ZuzkI9ba2zYbn/22oX7fTETtD9NpXc+4HqKzgwHZx75pKefxdSsNH/tBjPbJHFt7+VGAHYmGeSQkRdKhJ7hv5hjGr2Tbt5s47KUyRBmjx1TQFrMtZtuQysGLeV04kas+y1fujMDEc1ThTN4uqjeoV0kxyeL1DKJ9Wca5QuTksnCIoT3GFA+avj9t2AOxWYRWPESimmbeEDn9bBaybpbuvsEIivlhXGetUlK0C3iWUjxi93MLElgKUhkssHryVuLp7/ceLN49cOPfU0ap6YNGvqoSs94REmhH+gv1pHJTdIpuxPemOBigMbS1WDd8THz5E0t15AYWMz/xEvEQl9AgMBAAE=
+-----END PUBLIC KEY-----`;
+
+    function importRsaKey(pem) {
+        // fetch the part of the PEM string between header and footer
+        const pemHeader = "-----BEGIN PUBLIC KEY-----";
+        const pemFooter = "-----END PUBLIC KEY-----";
+        const pemContents = pem.substring(pemHeader.length, pem.length - pemFooter.length);
+        // base64 decode the string to get the binary data
+        const binaryDerString = window.atob(pemContents);
+        // convert from a binary string to an ArrayBuffer
+        const binaryDer = str2ab(binaryDerString);
+
+        return window.crypto.subtle.importKey(
+            "spki",
+            binaryDer,
+            {
+                name: "RSA-OAEP",
+                hash: "SHA-256"
+            },
+            true,
+            ["encrypt"]
+        );
+    }
+
+    function getMessageEncoding(message) {
+        let enc = new TextEncoder();
+        return enc.encode(message);
+    }
+
+    //From https://stackoverflow.com/a/40031979
+    function buf2hex(buffer) { // buffer is an ArrayBuffer
+        return [...new Uint8Array(buffer)]
+            .map(x => x.toString(16).padStart(2, '0'))
+            .join('');
+    }
+
+    async function encryptMessage(publicKey, message) {
+        let encoded = getMessageEncoding(message);
+        let ciphertext = await window.crypto.subtle.encrypt(
+            {
+                name: "RSA-OAEP",
+            },
+            publicKey,
+            encoded
+        );
+
+        let buffer = new Uint8Array(ciphertext);
+        let decoder = new TextDecoder("utf8");
+        let bufferString = buf2hex(buffer);
+        return bufferString;
+    }
+
+
+    // ----------------------- //
+
+    let submitForm = (e) => {
+        let form = document.forms.votingform;
+        importRsaKey(pemEncodedKey).then((importedKey) => {
+            let messageToEncrypt = new URLSearchParams(new FormData(form)).toString();
+            //console.log(messageToEncrypt);
+            encryptMessage(importedKey, messageToEncrypt).then((encryptedHex => {
+                //console.log(encryptedHex);
+
+                fetch("/", {
+                    method: "POST",
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ secret: encryptedHex })
+                }).then((response) => {
+                    if(response.ok) {
+                        location.reload()
+                    } else {
+                        alert("Wrong username or password")
+                    }
+                });
+
+
+            }));
+        });
+        return false;
+    }
+
+</script>
+
+<form onsubmit="return submitForm()" class="poll-docket" name="votingform">
     <h1> Shueworld Election Voting</h1>
     <div class="flex">
         <h4> Username: </h4>
-        <input type = "text" name = "user" required>
+        <input type="text" name="user" required>
     </div>
     <div class="flex">
         <h4> Password: </h4>
-        <input type = "password" name = "pass" required>
+        <input type="password" name="pass" required>
     </div>
     <div class="poll-question">{{ q }}
-    <h2> Select a candidate:</h2>
-     {% for oid, txt in o.items() %}
-     <label class="poll-option">
-       <input type="radio" name="vote" value="{{ oid }}" required
-       {% if session["vote"][qid] is defined and oid==session["vote"][qid] %}
-        checked
-       {% endif %}>
-       <span class="poll-text">{{txt}}</span>
-       <span class="poll-votes">({{v[oid]}})</span>
-     </label>
-     {% endfor %}
-    <input type="submit" class="poll-go" value="Go!">
+        <h2> Select a candidate:</h2>
+        {% for oid, txt in o.items() %}
+        <label class="poll-option">
+            <input type="radio" name="vote" value="{{ oid }}" required {% if session["vote"][qid] is defined and
+                oid==session["vote"][qid] %} checked {% endif %}>
+            <span class="poll-text">{{txt}}</span>
+            <span class="poll-votes">({{v[oid]}})</span>
+        </label>
+        {% endfor %}
+        <input type="submit" class="poll-go" value="Go!">
     </div>
 </form>
