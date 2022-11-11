@@ -10,8 +10,9 @@
 </style>
 
 <script>
-    //Credits to https://developer.mozilla.org
+    // ----------------------- //
 
+    // From https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/importKey#subjectpublickeyinfo_import
     // From https://developers.google.com/web/updates/2012/06/How-to-convert-ArrayBuffer-to-and-from-String
     function str2ab(str) {
         const buf = new ArrayBuffer(str.length);
@@ -22,10 +23,12 @@
         return buf;
     }
 
+    // Modified from https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/importKey#subjectpublickeyinfo_import
     const pemEncodedKey = `-----BEGIN PUBLIC KEY-----
 MIIBITANBgkqhkiG9w0BAQEFAAOCAQ4AMIIBCQKCAQBeg9ZuzkI9ba2zYbn/22oX7fTETtD9NpXc+4HqKzgwHZx75pKefxdSsNH/tBjPbJHFt7+VGAHYmGeSQkRdKhJ7hv5hjGr2Tbt5s47KUyRBmjx1TQFrMtZtuQysGLeV04kas+y1fujMDEc1ThTN4uqjeoV0kxyeL1DKJ9Wca5QuTksnCIoT3GFA+avj9t2AOxWYRWPESimmbeEDn9bBaybpbuvsEIivlhXGetUlK0C3iWUjxi93MLElgKUhkssHryVuLp7/ceLN49cOPfU0ap6YNGvqoSs94REmhH+gv1pHJTdIpuxPemOBigMbS1WDd8THz5E0t15AYWMz/xEvEQl9AgMBAAE=
 -----END PUBLIC KEY-----`;
 
+    // From https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/importKey#subjectpublickeyinfo_import
     function importRsaKey(pem) {
         // fetch the part of the PEM string between header and footer
         const pemHeader = "-----BEGIN PUBLIC KEY-----";
@@ -48,6 +51,7 @@ MIIBITANBgkqhkiG9w0BAQEFAAOCAQ4AMIIBCQKCAQBeg9ZuzkI9ba2zYbn/22oX7fTETtD9NpXc+4Hq
         );
     }
 
+    // Modified from https://github.com/mdn/dom-examples/blob/main/web-crypto/encrypt-decrypt/rsa-oaep.js
     function getMessageEncoding(message) {
         let enc = new TextEncoder();
         return enc.encode(message);
@@ -60,6 +64,7 @@ MIIBITANBgkqhkiG9w0BAQEFAAOCAQ4AMIIBCQKCAQBeg9ZuzkI9ba2zYbn/22oX7fTETtD9NpXc+4Hq
             .join('');
     }
 
+    // Modified from https://github.com/mdn/dom-examples/blob/main/web-crypto/encrypt-decrypt/rsa-oaep.js
     async function encryptMessage(publicKey, message) {
         let encoded = getMessageEncoding(message);
         let ciphertext = await window.crypto.subtle.encrypt(
