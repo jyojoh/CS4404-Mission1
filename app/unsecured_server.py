@@ -32,7 +32,7 @@ def index():
     data = db.get(qid)
     data["qid"] = qid
 
-    return render_template("webpage.html", **data)
+    return render_template("unsecuredwebpage.html", **data)
 
 
 if __name__ == '__main__':
